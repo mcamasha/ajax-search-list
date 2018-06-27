@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import axios from 'axios';
 
-const arr = ['Maria', 'Marina', 'Aleksey'];
+const API_KEY = '37662c76ffc19e5cd1b95f37d77155fc';
 
 function Option(props) {
     return <div><a href="#">{props.value}</a></div>;
@@ -24,30 +24,29 @@ class Form extends React.Component {
         let foundOptions = [];
         const value = e.target.value.toLowerCase();
         const self = this;
-        if (value != '') {
-            axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=37662c76ffc19e5cd1b95f37d77155fc&language=ru-RU&sort_by=popularity.desc&page=1`)
+        if (value !== '') {
+            axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=ru-RU&sort_by=popularity.desc&page=1`)
                 .then((response) => {
                     response.data.results.forEach(function (item) {
-                        // if (item.title.toLowerCase().search(value.toLowerCase()) !== -1) {
-                        //     const element = <Option value={item} />;
-                        //     foundOptions.push(element);
-                        // }
                         if (item.title.toLowerCase().search(value.toLowerCase()) !== -1) {
                             const element = <Option value={item.title} />;
                             foundOptions.push(element);
                         }
                         self.setState({
-                            found: foundOptions
+                            found: foundOptions,
+                            input: value
                         });
                     });
                 })
                 .catch((error) => {
                     console.log('Ошибка: ' + error.message);
                 });
+        } else {
+            this.setState({
+                input: value,
+                found: []
+            });
         }
-        this.setState({
-            input: value
-        });
     }
 
     handleClick() {
