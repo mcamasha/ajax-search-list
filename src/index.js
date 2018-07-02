@@ -1,77 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import axios from 'axios';
+import {App} from "./components/App";
+import { createStore } from 'redux';
+import reducer from './reducers/reducer'
+import { Provider } from 'react-redux';
 
-const API_KEY = '37662c76ffc19e5cd1b95f37d77155fc';
+const store = createStore(reducer);
 
-function Option(props) {
-    return <div><a href="#">{props.value}</a></div>;
-}
-
-class Form extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleClick = this.handleClick.bind(this);
-        this.state = {
-            input: '',
-            found: []
-        };
-    }
-
-    handleChange(e) {
-        let foundOptions = [];
-        const value = e.target.value.toLowerCase();
-        const self = this;
-        if (value !== '') {
-            axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=ru-RU&sort_by=popularity.desc&page=1`)
-                .then((response) => {
-                    response.data.results.forEach(function (item) {
-                        if (item.title.toLowerCase().search(value.toLowerCase()) !== -1) {
-                            const element = <Option value={item.title} />;
-                            foundOptions.push(element);
-                        }
-                        self.setState({
-                            found: foundOptions,
-                            input: value
-                        });
-                    });
-                })
-                .catch((error) => {
-                    console.log('Ошибка: ' + error.message);
-                });
-        } else {
-            this.setState({
-                input: value,
-                found: []
-            });
-        }
-    }
-
-    handleClick() {
-        alert("Найдено похожих запросов: " + this.state.found.length);
-    }
-
-    render() {
-        return (
-            <div>
-                <div>
-                    <input value={this.state.input} onChange={(e) => this.handleChange(e)} />
-                    <button onClick={this.handleClick}>Click</button>
-                </div>
-                <div>
-                    {this.state.found}
-                </div>
-            </div>
-        );
-    }
-}
-
-class App extends React.Component {
-    render() {
-        return <Form />
-    }
-}
-
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+    <Provider store={store}>
+        <App />
+    </Provider>,
+document.getElementById('root'));
